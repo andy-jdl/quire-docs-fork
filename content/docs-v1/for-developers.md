@@ -33,7 +33,6 @@ This repository is specifically for the Quire website and documentation.
   ├── _includes/ # Language agnostic templates consumed inline by other templates (including layouts) 
   ├── _layouts/ # Chainable language agnostic templates that wrap content via the layout front matter key
   ├── _lib/ # Shared JS utility modules
-  ├── _patches/ # Patch files applied to node_modules automatically via the npm
   ├── _plugins/ # Custom Eleventy plugins
   ├── _site/ # Generated build of your project
   ├── content/ # Your Project
@@ -94,11 +93,11 @@ With Quire's release, we switched from Hugo to 11ty which supports YAML for conf
 
 | Property | Set Via | Expected Value | Description |
 | --- | --- | --- | --- |
-| `input` | `eleventyConfig.setInputDirectory()` | string | Directory Eleventy scans to resolve templates. Defaults to `content`, or override with the `ELEVENTY_INPUT` environment variable. |
-| `output` | `eleventyConfig.setOutputDirectory()` | string | Directory the built site is written to. Defaults to `_site`, or override with `ELEVENTY_OUTPUT`. |
-| `data` | `eleventyConfig.setDataDirectory()` | string | Directory (relative to `input`) Eleventy resolves for data files. Defaults to `_computed`, or override with `ELEVENTY_DATA`. |
-| `includes` | `eleventyConfig.setIncludesDirectory()` | string | Directory (relative to `input`) for templates consumed inline by other templates. Defaults to `../_includes`, or override with `ELEVENTY_INCLUDES`. |
-| `layouts` | `eleventyConfig.setLayoutsDirectory()` | string | Directory (relative to `input`) Eleventy resolves for layout templates. Defaults to `../_layouts`, or override with `ELEVENTY_LAYOUTS`. |
+| `input` | `ELEVENTY_INPUT` environment variable | string | Directory Eleventy scans to resolve templates. Defaults to `content`. |
+| `output` | `ELEVENTY_OUTPUT` environment variable | string | Directory the built site is written to. Defaults to `_site`. |
+| `data` | `ELEVENTY_DATA` environment variable | string | Directory (relative to `input`) Eleventy resolves for data files. Defaults to `_computed`. |
+| `includes` | `ELEVENTY_INCLUDES` environment variable | string | Directory (relative to `input`) for templates consumed inline by other templates. Defaults to `../_includes`. |
+| `layouts` | `ELEVENTY_LAYOUTS` environment variable | string | Directory (relative to `input`) Eleventy resolves for layout templates. Defaults to `../_layouts`. |
 | `publicDir` | local variable, used with `addPassthroughCopy()` | string \| `false` | Path to static assets copied through as-is on **production** builds only. Automatically resolves to `public` when `ELEVENTY_ENV=production`, otherwise `false` — not intended to be set manually. |
 | `templateFormats` | `eleventyConfig.setTemplateFormats()` | string array | Which template languages Eleventy processes. Quire sets `['11ty.js', 'html', 'liquid', 'md', 'njk']`. Use `addTemplateFormats()` to append more without overriding this list. |
 | `watchTargets` | `eleventyConfig.addWatchTarget()` | string (glob) | Additional files/directories that trigger a rebuild when changed. Quire watches `**/*.css`, `**/*.js`, `**/*.scss`. |
@@ -203,14 +202,14 @@ Shortcodes are reusable components that may accept a number of parameters. These
 - `njk`
 
 ### Eleventy Config
-Shortcodes may be added via `eleventyConfig.addShortcode` and `eleventyConfig.addPairedShortcode` under the `.eleventy.js` config file. It is highly recommended to add shortcodes via Quire's Shortcode Plugin.
+Shortcodes may be added via `eleventyConfig.addShortcode` and `eleventyConfig.addPairedShortcode` under the `.eleventy.js` config file.
 
 *Basic shortcode example*
 
 Javascript
 eleventyConfig.addShortcode("year", () => ${new Date().getFullYear()})
 
-njk
+liquid
 {% year %}
 
 *Basic paired shortcode example*
@@ -227,15 +226,6 @@ This is important.
 
 ### Quire's Shortcode Plugin
 Rather than calling eleventyConfig directly, Quire provides a thin wrapper under the `_plugins/shortcodes/index.js` directory. This wrapper (known as `shortcodefactory`) provides page and collection data to your component.
-
-*Why use Quire's Shortcode Plugin*:
-- Allows shortcodes to be registered identically across all supported template languages.
-- Decouples shortcode logic from Eleventy's internal structure.
-
-### Creating a shortcode
-You should create your shortcodes under the `_plugins/shortcodes` directory.
-
-After creating your component, register it by calling `addShortcode` or `addPairedShortcode` inside `_plugins/shortcodes/index.js`.
 
 ### Available Shortcodes
 | Shortcode | Type | Parameters | Description |
